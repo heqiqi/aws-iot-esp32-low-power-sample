@@ -104,7 +104,8 @@ idf.py flash monitor
 
 
 ### 设备端日志
-
+被timer从deep sleep模式唤醒 --> 检查消息队列 --> pub to IoT --> 再进入deep sleep
+![image](https://github.com/heqiqi/aws-iot-esp32-low-power-sample/blob/main/img/running-log.png)
 
 ###功耗对比
 正常工作模式,电流为120mA
@@ -116,3 +117,4 @@ idf.py flash monitor
 
 ##结论
 通过将IoT SDK的代码移植到功耗较小的MCU上,并且使用定期上报和事件唤醒的方式,可以有效的控制IoT设备功耗,增加使用时长.
+从工作电流来比较,功耗仅为长期保持连接的10%左右.
