@@ -89,5 +89,30 @@ idf.py build
 idf.py flash monitor
 ```
 
-### 设备端流程
+### 设备端流程图
+![image](https://github.com/heqiqi/aws-iot-esp32-low-power-sample/blob/main/img/ESP32-workflow.png)
 
+设备流程介绍:
+- 当ESP32首次上电点时,首先初始化flash,PSRAM的外围设备
+- 按照配置连接Wifi
+- 同时监听IO, 此DEMO坚挺的事GPIO15,实际生产中可以时GPIO,I2S等任何IO
+- Wifi连接成功后,通过mqtt 客户端连接iot core服务获取服务端消息
+- 如果有消息进入消息队列
+- 根据消息队列里的消息类型,执行设备控制或消息上报等操作
+- 消息队列消息完成,即刻进入低功耗的deep sleep 模式
+- 指导timer唤起重新获取服务端消息,或被监听的GPIO事件唤起
+
+
+### 设备端日志
+
+
+###功耗对比
+正常工作模式,电流为120mA
+![image](https://github.com/heqiqi/aws-iot-esp32-low-power-sample/blob/main/img/high-current.png)
+
+进入低功耗的Deep Sleep 模式, 工作电流为 10mA
+![image](https://github.com/heqiqi/aws-iot-esp32-low-power-sample/blob/main/img/low-power-current.png)
+
+
+##结论
+通过将IoT SDK的代码移植到功耗较小的MCU上,并且使用定期上报和事件唤醒的方式,可以有效的控制IoT设备功耗,增加使用时长.
