@@ -100,14 +100,14 @@ void iot_task(void *pvParameters)
 
 void deep_sleep_task(void *pvParameters)
 {
-    
     for(int i=0;i<15;i++){
          vTaskDelay(pdMS_TO_TICKS(1*1000));
-         ESP_LOGI(TAG,"enter deep sleep mode, after %d seconds",15-i);
          UBaseType_t queueSize = uxQueueMessagesWaiting(device_status_queue);
          if(queueSize > 0){
             ESP_LOGI(TAG,"device_status_queue is not empty, queue size: %d, recount down",queueSize);
             i = 0;
+         }else{
+            ESP_LOGI(TAG,"enter deep sleep mode, after %d seconds",15-i);
          }
     }
    
@@ -137,7 +137,7 @@ void receive_msg_from_queue(void *pvParameters)
     int task_id = (int)pvParameters;
     DeviceStatus received_device_status;
     if (xQueueReceive(device_status_queue, &received_device_status, pdMS_TO_TICKS(2000)) != pdPASS) {
-            ESP_LOGE(TAG, "task_id: %d, Failed to received message from device_status_queue, size: %d",task_id, uxQueueMessagesWaiting(device_status_queue));
+            ESP_LOGW(TAG, "task_id: %d, device_status_queue size: %d, ready to deep sleep, lower power mode",task_id, uxQueueMessagesWaiting(device_status_queue));
             
     } else {
             ESP_LOGI(TAG, "task_id: %d, Received message from device_status_queue: %s ,queue size: %d",task_id, received_device_status.device_msg, uxQueueMessagesWaiting(device_status_queue) );
@@ -149,7 +149,6 @@ void app_main()
     ESP_LOGI(TAG, "[APP] Startup..");
     ESP_LOGI(TAG, "[APP] Free memory: %"PRIu32" bytes", esp_get_free_heap_size());
     ESP_LOGI(TAG, "[APP] IDF version: %s", esp_get_idf_version());
-
     esp_log_level_set("*", ESP_LOG_INFO);
     
     /* Initialize NVS partition */
@@ -158,8 +157,6 @@ void app_main()
         /* NVS partition was truncated
          * and needs to be erased */
         ESP_ERROR_CHECK(nvs_flash_erase());
-
-        /* Retry nvs_flash_init */
         ESP_ERROR_CHECK(nvs_flash_init());
     }
     
@@ -170,13 +167,13 @@ void app_main()
     key_monitor();
     //setup wifi
     wifi_init();
-    
+    xTaskCreate(&iot_task, "iot_core_mqtt_task", 4096, NULL, 5, NULL);
 
     ESP_LOGI(TAG, "[APP] Getting wakeup_reason");
-    if(ESP_SLEEP_WAKEUP_TIMER == get_wakeup_reason() || uxQueueMessagesWaiting(device_status_queue) > 0 ){
-        ESP_LOGI(TAG, "[APP] Wakeup reason: ESP_SLEEP_WAKEUP_TIMER, publish device status msg to aws iot");
-        xTaskCreate(&iot_task, "iot_core_mqtt_task", 4096, NULL, 5, NULL);
-    }
+    get_wakeup_reason();
+    int queue_size = uxQueueMessagesWaiting(device_status_queue);
+
+    ESP_LOGI(TAG, "[APP] device status queue size: %d", queue_size);
     
     ESP_LOGI(TAG, "[APP] check the local msg queue, and enter_deep_sleep_mode");
     
