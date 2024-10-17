@@ -8,6 +8,7 @@
 - 利用ESP32的Deep Sleep模式降低功耗
   
 乐鑫科技的ESP32芯片有非常良好的功耗管理设计,并且对FreeRT OS提供了完善的支持,可以非常方面的接入AWS IoT Core服务, 故本此方案的设备端采用ESP32-EYE 开发板进行.
+
 ![image](https://github.com/heqiqi/aws-iot-esp32-low-power-sample/blob/main/img/esp32-eye-devkit.png)
 
 在deep sleep模式下的理论功耗,见下表:
