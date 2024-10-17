@@ -138,7 +138,7 @@ void receive_msg_from_queue(void *pvParameters)
     int task_id = (int)pvParameters;
     DeviceStatus received_device_status;
     if (xQueueReceive(device_status_queue, &received_device_status, pdMS_TO_TICKS(2000)) != pdPASS) {
-            ESP_LOGW(TAG, "task_id: %d, device_status_queue size: %d, ready to deep sleep, lower power mode",task_id, uxQueueMessagesWaiting(device_status_queue));
+            ESP_LOGW(TAG, "task_id: %d, device status queue size: %d, ready to deep sleep, lower power mode",task_id, uxQueueMessagesWaiting(device_status_queue));
             
     } else {
             ESP_LOGI(TAG, "task_id: %d, Received message from device_status_queue: %s ,queue size: %d",task_id, received_device_status.device_msg, uxQueueMessagesWaiting(device_status_queue) );
@@ -149,7 +149,7 @@ void app_main()
 {
     ESP_LOGI(TAG, "[APP] Startup..");
     ESP_LOGI(TAG, "[APP] Free memory: %"PRIu32" bytes", esp_get_free_heap_size());
-    ESP_LOGI(TAG, "[APP] IDF version: %s", esp_get_idf_version());
+    // ESP_LOGI(TAG, "[APP] IDF version: %s", esp_get_idf_version());
     esp_log_level_set("*", ESP_LOG_INFO);
     
     /* Initialize NVS partition */
@@ -164,8 +164,8 @@ void app_main()
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
     device_status_queue = xQueueCreate(50, sizeof(DeviceStatus));
-    
-    ESP_LOGI(TAG, "[APP] Getting wakeup_reason:\n");
+
+    ESP_LOGI(TAG, "[APP] Getting wakeup_reason:");
     get_wakeup_reason();
 
     key_monitor();
@@ -177,8 +177,6 @@ void app_main()
     int queue_size = uxQueueMessagesWaiting(device_status_queue);
 
     ESP_LOGI(TAG, "[APP] device status queue size: %d", queue_size);
-    
-    ESP_LOGI(TAG, "[APP] check the local msg queue, and enter_deep_sleep_mode");
     
     xTaskCreate(&deep_sleep_task, "deep_sleep_task", 2048, NULL, 5, NULL);
 }

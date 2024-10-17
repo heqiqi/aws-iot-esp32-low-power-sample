@@ -841,8 +841,8 @@ static void cleanupOutgoingPublishWithPacketID( uint16_t packetId )
         if( outgoingPublishPackets[ index ].packetId == packetId )
         {
             cleanupOutgoingPublishAt( index );
-            LogInfo( ( "Cleaned up outgoing publish packet with packet id %u.\n\n",
-                       packetId ) );
+            // LogInfo( ( "Cleaned up outgoing publish packet with packet id %u.\n\n",
+            //            packetId ) );
             break;
         }
     }
@@ -941,7 +941,7 @@ static void handleIncomingPublish( MQTTPublishInfo_t * pPublishInfo,
     {
         LogInfo( ( "Incoming Publish Topic Name: %.*s matches subscribed topic.\n"
                    "Incoming Publish message Packet Id is %u.\n"
-                   "Incoming Publish Message : %.*s.\n\n",
+                   "Incoming Publish Message : %.*s.",
                    pPublishInfo->topicNameLength,
                    pPublishInfo->pTopicName,
                    packetIdentifier,
@@ -1223,7 +1223,7 @@ static int establishMqttSession( MQTTContext_t * pMqttContext,
     }
     else
     {
-        LogInfo( ( "MQTT connection successfully established with broker.\n\n" ) );
+        LogInfo( ( "MQTT connection successfully established with broker." ) );
     }
 
     return returnStatus;
@@ -1285,7 +1285,7 @@ static int subscribeToTopic( MQTTContext_t * pMqttContext )
     }
     else
     {
-        LogInfo( ( "SUBSCRIBE sent for topic %.*s to broker.\n\n",
+        LogInfo( ( "SUBSCRIBE sent for topic %.*s to broker.",
                    MQTT_EXAMPLE_TOPIC_LENGTH,
                    MQTT_EXAMPLE_TOPIC ) );
     }
@@ -1733,7 +1733,7 @@ int aws_iot_demo_main( int argc,
                 else
                 {
                     LogInfo( ( "A clean MQTT connection is established."
-                               " Cleaning up all the stored outgoing publishes.\n\n" ) );
+                               " Cleaning up all the stored outgoing publishes." ) );
 
                     /* Clean up the outgoing publishes waiting for ack as this new
                      * connection doesn't re-establish an existing session. */
