@@ -14,12 +14,12 @@
 在deep sleep模式下的理论功耗,见下表:
 ![image](https://github.com/heqiqi/aws-iot-esp32-low-power-sample/blob/main/img/deepsleep-power.png)
 
-##系统架构图
+## 系统架构图
 ![image](https://github.com/heqiqi/aws-iot-esp32-low-power-sample/blob/main/img/architecture.png)
 
 设备端外挂了一个ESP32的MCU完成wifi连接,以及与IoT Core服务通信功能,尽量降级维持mqtt通信的功耗.
 
-##验证工程
+## 验证工程
 ### 安装乐鑫ESP-IDF开发工具链
 请参考[官方配置步骤](https://docs.espressif.com/projects/esp-idf/en/stable/esp32/index.html), 工具链版本选择tag: v4.4.6 .
 
@@ -108,7 +108,7 @@ idf.py flash monitor
 被timer从deep sleep模式唤醒 --> 检查消息队列 --> pub to IoT --> 再进入deep sleep
 ![image](https://github.com/heqiqi/aws-iot-esp32-low-power-sample/blob/main/img/running-log.png)
 
-###功耗对比
+### 功耗对比
 正常工作模式,电流为120mA
 ![image](https://github.com/heqiqi/aws-iot-esp32-low-power-sample/blob/main/img/high-current.png)
 
@@ -116,6 +116,6 @@ idf.py flash monitor
 ![image](https://github.com/heqiqi/aws-iot-esp32-low-power-sample/blob/main/img/low-power-current.png)
 
 
-##结论
+## 结论
 通过将IoT SDK的代码移植到功耗较小的MCU上,并且使用定期上报和事件唤醒的方式,可以有效的控制IoT设备功耗,增加使用时长.
 从工作电流来比较,功耗仅为长期保持连接的10%左右.
