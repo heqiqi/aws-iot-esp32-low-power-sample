@@ -9,8 +9,10 @@
 #include "esp_sleep.h"
 #include "esp_task_wdt.h"
 #include "esp_wifi.h"
+#include "driver/gpio.h"
 #include "protocol_examples_common.h"
 
+#define BUTTON_GPIO_0 GPIO_NUM_0
 
 static const char *TAG = "ESP32_POWER_MANAGE";
 
@@ -35,7 +37,17 @@ void disable_rtc_wdt() {
 
 void enter_deep_sleep_mode(int duration) {
     ESP_LOGI(TAG, "[APP] Going to deep sleep for %d seconds...", DEEP_SLEEP_DURATION);
-    esp_deep_sleep(duration); 
+   
+    gpio_config_t io_conf = {
+        .pin_bit_mask = (1ULL << BUTTON_GPIO_0),
+        .mode = GPIO_MODE_INPUT,
+        .pull_up_en = GPIO_PULLUP_ENABLE,
+        .pull_down_en = GPIO_PULLDOWN_DISABLE,
+        .intr_type = GPIO_INTR_DISABLE
+    };
+    gpio_config(&io_conf);
+    esp_sleep_enable_ext0_wakeup(BUTTON_GPIO_0, 0);
+     esp_deep_sleep(duration); 
     
 }
 
@@ -47,19 +59,19 @@ int get_wakeup_reason(){
  
     switch (wakeup_reason) {
         case ESP_SLEEP_WAKEUP_EXT0:
-            ESP_LOGI(TAG,"Wakeup caused by external signal using RTC_IO");
+            ESP_LOGW(TAG,"Wakeup caused by external signal using RTC_IO");
             break;
         case ESP_SLEEP_WAKEUP_EXT1:
-            ESP_LOGI(TAG,"Wakeup caused by external signal using RTC_CNTL");
+            ESP_LOGW(TAG,"Wakeup caused by external signal using RTC_CNTL");
             break;
         case ESP_SLEEP_WAKEUP_TIMER:
-          ESP_LOGI(TAG,"Wakeup caused by timer");
+          ESP_LOGW(TAG,"Wakeup caused by timer");
             break;
         case ESP_SLEEP_WAKEUP_TOUCHPAD:
             ESP_LOGI(TAG,"Wakeup caused by touchpad");
             break;
         case ESP_SLEEP_WAKEUP_ULP:
-            ESP_LOGI(TAG,"Wakeup caused by ULP program");
+            ESP_LOGW(TAG,"Wakeup caused by ULP program");
             break;
         default:
             ESP_LOGI(TAG,"Wakeup was not caused by deep sleep: %d\n", wakeup_reason);

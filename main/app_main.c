@@ -21,7 +21,7 @@
 #include "esp_log.h"
 #include "esp_sleep.h"
 
-#define BUTTON_GPIO 15
+#define BUTTON_GPIO GPIO_NUM_15
 #define ESP_INTR_FLAG_DEFAULT 0
 
 
@@ -111,7 +111,8 @@ void deep_sleep_task(void *pvParameters)
          }
     }
    
-    ESP_LOGI(TAG,"time to enter deep sleep mode");
+    ESP_LOGI(TAG,"time to enter deep sleep");
+
     enter_deep_sleep_mode(DEEP_SLEEP_DURATION * uS_TO_S_FACTOR);
     
 }
@@ -163,14 +164,16 @@ void app_main()
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
     device_status_queue = xQueueCreate(50, sizeof(DeviceStatus));
+    
+    ESP_LOGI(TAG, "[APP] Getting wakeup_reason:\n");
+    get_wakeup_reason();
 
     key_monitor();
     //setup wifi
     wifi_init();
     xTaskCreate(&iot_task, "iot_core_mqtt_task", 4096, NULL, 5, NULL);
 
-    ESP_LOGI(TAG, "[APP] Getting wakeup_reason");
-    get_wakeup_reason();
+
     int queue_size = uxQueueMessagesWaiting(device_status_queue);
 
     ESP_LOGI(TAG, "[APP] device status queue size: %d", queue_size);
